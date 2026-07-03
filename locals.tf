@@ -1,34 +1,19 @@
-# TODO: insert locals here.
 locals {
-  managed_identities = {
-    system_assigned_user_assigned = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? {
-      this = {
-        type                       = var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
-        user_assigned_resource_ids = var.managed_identities.user_assigned_resource_ids
-      }
-    } : {}
-    system_assigned = var.managed_identities.system_assigned ? {
-      this = {
-        type = "SystemAssigned"
-      }
-    } : {}
-    user_assigned = length(var.managed_identities.user_assigned_resource_ids) > 0 ? {
-      this = {
-        type                       = "UserAssigned"
-        user_assigned_resource_ids = var.managed_identities.user_assigned_resource_ids
-      }
-    } : {}
-  }
-  # Private endpoint application security group associations.
-  # We merge the nested maps from private endpoints and application security group associations into a single map.
-  private_endpoint_application_security_group_associations = { for assoc in flatten([
-    for pe_k, pe_v in var.private_endpoints : [
-      for asg_k, asg_v in pe_v.application_security_group_associations : {
-        asg_key         = asg_k
-        pe_key          = pe_k
-        asg_resource_id = asg_v
-      }
-    ]
-  ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
+  # Managed HSM SKU family is derived from the SKU name (C-family for Custom_C*, otherwise B-family).
+  sku_family = startswith(var.sku_name, "Custom_C") ? "C" : "B"
+
+  # The resource group ID (== parent_id), reused as the default parent scope for private endpoints.
+  resource_group_id = var.parent_id
+
+  # User-Agent header injected into every AzAPI request for module telemetry.
+  tracing_headers = var.enable_telemetry ? { "User-Agent" = local.avm_azapi_header } : null
+
+  # Normalise `managed_identities` into the AzAPI `identity` block `type`. Computed locally (rather than
+  # via the avm_interfaces module) to avoid a dependency cycle: avm_interfaces is scoped to
+  # azapi_resource.this.id, so azapi_resource.this must not depend on avm_interfaces.
+  managed_identity_type = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? (
+    (var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0) ? "SystemAssigned, UserAssigned" : (
+      length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
+    )
+  ) : null
 }
