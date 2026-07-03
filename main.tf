@@ -84,11 +84,13 @@ resource "azapi_resource" "this" {
 # azapi_resource.this (managed identity is therefore computed locally - see locals.tf).
 module "avm_interfaces" {
   source  = "Azure/avm-utl-interfaces/azure"
-  version = "~> 0.6"
+  version = "0.6.0"
 
-  diagnostic_settings_v2                    = var.diagnostic_settings
-  enable_telemetry                          = var.enable_telemetry
-  private_endpoints                         = var.private_endpoints
+  diagnostic_settings_v2 = var.diagnostic_settings
+  enable_telemetry       = var.enable_telemetry
+  private_endpoints = {
+    for k, v in var.private_endpoints : k => merge(v, { subresource_name = "managedhsm" })
+  }
   private_endpoints_manage_dns_zone_group   = var.private_endpoints_manage_dns_zone_group
   private_endpoints_scope                   = azapi_resource.this.id
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled

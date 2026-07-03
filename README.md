@@ -217,14 +217,13 @@ Default: `{}`
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
 Description: A map of private endpoints to create on the Managed HSM. The map key is deliberately arbitrary to avoid issues where  
-map keys may be unknown at plan time. The private endpoint targets the `managedhsm` sub-resource by default.
+map keys may be unknown at plan time. The private endpoint always targets the `managedhsm` sub-resource (group ID).
 
 - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
 - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. See `var.role_assignments`.
 - `lock` - (Optional) The lock to apply to the private endpoint.
 - `tags` - (Optional) A mapping of tags to assign to the private endpoint. Defaults to `var.tags`.
 - `subnet_resource_id` - (Required) The resource ID of the subnet to deploy the private endpoint in.
-- `subresource_name` - (Optional) The Managed HSM sub-resource (group ID) to connect to. Defaults to `managedhsm`.
 - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. Defaults to `default`.
 - `private_dns_zone_resource_ids` - (Optional) A set of private DNS zone resource IDs (e.g. `privatelink.managedhsm.azure.net`). If empty, no zone group is created.
 - `application_security_group_associations` - (Optional) A map of application security group resource IDs to associate. The map key is arbitrary.
@@ -232,7 +231,7 @@ map keys may be unknown at plan time. The private endpoint targets the `managedh
 - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
 - `location` - (Optional) The location of the private endpoint. Defaults to the Managed HSM location.
 - `resource_group_name` - (Optional) The resource group resource ID of the private endpoint. Defaults to the Managed HSM resource group.
-- `ip_configurations` - (Optional) A map of static IP configurations (`name`, `private_ip_address`, optional `member_name`). The map key is arbitrary.
+- `ip_configurations` - (Optional) A map of static IP configurations (`name`, `private_ip_address`). The map key is arbitrary.
 
 Type:
 
@@ -240,7 +239,6 @@ Type:
 map(object({
     name = optional(string, null)
     role_assignments = optional(map(object({
-      name                                   = optional(string, null)
       role_definition_id_or_name             = string
       principal_id                           = string
       description                            = optional(string, null)
@@ -256,7 +254,6 @@ map(object({
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_name                        = optional(string, "managedhsm")
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
@@ -267,7 +264,6 @@ map(object({
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
-      member_name        = optional(string)
     })), {})
   }))
 ```
@@ -374,7 +370,6 @@ arbitrary to avoid issues where map keys may be unknown at plan time.
 > They are **not** the HSM **local / data-plane RBAC** roles (`Managed HSM Administrator`, `Managed HSM Crypto User`,
 > etc.), which are assigned via the data plane after activation and are out of scope for this module.
 
-- `name` - (Optional) The name of the role assignment. If not set, a GUID will be generated.
 - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
 - `principal_id` - The ID of the principal to assign the role to.
 - `description` - (Optional) The description of the role assignment.
@@ -388,7 +383,6 @@ Type:
 
 ```hcl
 map(object({
-    name                                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)
@@ -493,7 +487,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-interfaces/azure
 
-Version: ~> 0.6
+Version: 0.6.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
