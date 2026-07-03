@@ -1,0 +1,9 @@
+# Skip end-to-end (deploy) testing for this example.
+#
+# Azure Key Vault Managed HSM bills at the full hourly rate from creation, and with
+# purge protection enabled (the module default) a deleted HSM cannot be purged until
+# its soft-delete retention window (7-90 days) elapses - it keeps billing and holding
+# the per-subscription HSM quota the whole time. Deploying and tearing it down on every
+# PR is therefore too costly/slow, so e2e is skipped here; deployment is validated
+# locally and via on-demand integration tests. The AVM pipeline keys off this file's
+# presence only (see test-examples / pr-check porch configs) - content is ignored.
