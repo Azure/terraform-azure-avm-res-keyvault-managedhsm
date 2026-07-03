@@ -129,6 +129,13 @@ resource "azapi_resource" "lock" {
       update = timeouts.value.update
     }
   }
+
+  # Create the lock last and destroy it first, so a CanNotDelete/ReadOnly lock does not block
+  # teardown of the HSM-scoped child resources (role assignments, diagnostic settings).
+  depends_on = [
+    azapi_resource.diagnostic_settings,
+    azapi_resource.role_assignments,
+  ]
 }
 
 # AVM interface: Azure RBAC (control-plane) role assignments on the Managed HSM scope.

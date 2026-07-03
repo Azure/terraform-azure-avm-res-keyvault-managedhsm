@@ -139,8 +139,8 @@ module "managed_hsm" {
 
   role_assignments = {
     # Control-plane (Azure RBAC) example — NOT a local/data-plane HSM role.
-    contributor = {
-      role_definition_id_or_name = "Managed HSM Contributor"
+    reader = {
+      role_definition_id_or_name = "Reader"
       principal_id               = data.azurerm_client_config.current.object_id
       principal_type             = "User"
     }
