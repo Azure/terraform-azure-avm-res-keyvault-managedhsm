@@ -22,6 +22,12 @@ variables {
 run "default_creates_hsm_and_telemetry" {
   command = apply
 
+  variables {
+    # AVM CI (managed-pr-check.yml) sets TF_VAR_enable_telemetry=false; override it here so
+    # this run deterministically exercises the telemetry-enabled path asserted below.
+    enable_telemetry = true
+  }
+
   assert {
     condition     = azapi_resource.this.name == var.name
     error_message = "The Managed HSM resource name should match var.name."
