@@ -7,14 +7,14 @@ resource "azapi_resource" "private_endpoints" {
   parent_id              = coalesce(var.private_endpoints[each.key].resource_group_name, local.resource_group_id)
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
+  create_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  delete_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  read_headers           = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
   tags                   = each.value.tags != null ? each.value.tags : var.tags
-  update_headers         = local.tracing_headers
+  update_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -35,13 +35,13 @@ resource "azapi_resource" "private_dns_zone_groups" {
   parent_id              = azapi_resource.private_endpoints[each.key].id
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
+  create_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  delete_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  read_headers           = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
-  update_headers         = local.tracing_headers
+  update_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -89,13 +89,13 @@ resource "azapi_resource" "private_endpoint_locks" {
   parent_id              = azapi_resource.private_endpoints[each.value.pe_key].id
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
+  create_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  delete_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  read_headers           = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
-  update_headers         = local.tracing_headers
+  update_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
