@@ -6,8 +6,8 @@ resource "azapi_resource" "diagnostic_settings" {
   parent_id            = azapi_resource.this.id
   type                 = each.value.type
   body                 = each.value.body
-  create_headers       = local.tracing_headers
-  delete_headers       = local.tracing_headers
+  create_headers       = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  delete_headers       = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   ignore_null_property = true
   ignore_other_items_in_list = [
     "properties.logs",
@@ -17,12 +17,12 @@ resource "azapi_resource" "diagnostic_settings" {
     "properties.logs"    = "category, categoryGroup"
     "properties.metrics" = "category"
   }
-  read_headers              = local.tracing_headers
+  read_headers              = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   replace_triggers_refs     = []
   response_export_values    = []
   retry                     = var.retry
   schema_validation_enabled = false
-  update_headers            = local.tracing_headers
+  update_headers            = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
