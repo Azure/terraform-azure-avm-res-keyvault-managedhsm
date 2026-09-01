@@ -62,13 +62,13 @@ resource "azapi_resource" "private_endpoint_role_assignments" {
   parent_id              = azapi_resource.private_endpoints[each.value.pe_key].id
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
+  create_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  delete_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  read_headers           = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
-  update_headers         = local.tracing_headers
+  update_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

@@ -39,9 +39,9 @@ resource "azapi_resource" "this" {
       }
     )
   }
-  create_headers = local.tracing_headers
-  delete_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
+  create_headers = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  delete_headers = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  read_headers   = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   # `name` and `location` are implicit replace triggers; list only the immutable body paths (TFFR5).
   replace_triggers_refs = [
     "sku.name",
@@ -56,7 +56,7 @@ resource "azapi_resource" "this" {
   retry                     = var.retry
   schema_validation_enabled = var.schema_validation_enabled
   tags                      = var.tags
-  update_headers            = local.tracing_headers
+  update_headers            = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
 
   dynamic "identity" {
     for_each = local.managed_identity_type == null ? [] : [local.managed_identity_type]
@@ -146,13 +146,13 @@ resource "azapi_resource" "role_assignments" {
   parent_id              = azapi_resource.this.id
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
+  create_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  delete_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
+  read_headers           = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
   replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
-  update_headers         = local.tracing_headers
+  update_headers         = merge(local.tracing_headers, (var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : {}))
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
