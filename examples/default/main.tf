@@ -52,11 +52,11 @@ resource "azurerm_resource_group" "this" {
 module "managed_hsm" {
   source = "../../"
 
-  location  = azurerm_resource_group.this.location
-  name      = "mhsm${random_string.suffix.result}"
-  parent_id = azurerm_resource_group.this.id
-  tenant_id = data.azurerm_client_config.current.tenant_id
   # In a real deployment, supply a SECURITY GROUP object ID rather than the current user.
   admin_object_ids = [data.azurerm_client_config.current.object_id]
+  location         = azurerm_resource_group.this.location
+  name             = "mhsm${random_string.suffix.result}"
+  parent_id        = azurerm_resource_group.this.id
+  tenant_id        = data.azurerm_client_config.current.tenant_id
   enable_telemetry = var.enable_telemetry
 }
