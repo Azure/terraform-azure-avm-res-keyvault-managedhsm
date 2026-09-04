@@ -5,8 +5,6 @@ locals {
   # The resource group ID (== parent_id), reused as the default parent scope for private endpoints.
   resource_group_id = var.parent_id
 
-  # User-Agent header injected into every AzAPI request for module telemetry.
-  tracing_headers = var.enable_telemetry ? { "User-Agent" = local.avm_azapi_header } : null
 
   # Normalise `managed_identities` into the AzAPI `identity` block `type`. Computed locally (rather than
   # via the avm_interfaces module) to avoid a dependency cycle: avm_interfaces is scoped to
