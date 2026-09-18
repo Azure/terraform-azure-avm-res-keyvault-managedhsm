@@ -31,7 +31,7 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.12.0"
 
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 resource "random_integer" "region_index" {
@@ -67,7 +67,7 @@ module "managed_hsm" {
   name             = "mhsm${random_string.suffix.result}"
   parent_id        = azurerm_resource_group.this.id
   tenant_id        = data.azurerm_client_config.current.tenant_id
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 ```
 
@@ -108,7 +108,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 

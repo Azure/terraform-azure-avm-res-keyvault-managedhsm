@@ -46,7 +46,7 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.12.0"
 
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 resource "random_integer" "region_index" {
@@ -130,7 +130,7 @@ module "managed_hsm" {
       metrics               = [{ category = "AllMetrics" }]
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   lock = {
     kind = "CanNotDelete"
   }
@@ -207,7 +207,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 
