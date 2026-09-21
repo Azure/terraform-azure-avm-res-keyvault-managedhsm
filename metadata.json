@@ -6,5 +6,8 @@
   "owners": [
     "benvbr"
   ],
-  "telemetryIdPrefix": "46d3xtrf.res.85c5d6a"
+  "telemetryIdPrefix": "46d3xtrf.res.85c5d6a",
+  "alternativeNames": [
+    "mHSM"
+  ]
 }
