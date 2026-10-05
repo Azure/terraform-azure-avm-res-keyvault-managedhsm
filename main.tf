@@ -107,7 +107,6 @@ resource "azapi_resource" "lock" {
       notes = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
     }
   }
-  replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
 
@@ -138,7 +137,6 @@ resource "azapi_resource" "role_assignments" {
   parent_id              = azapi_resource.this.id
   type                   = each.value.type
   body                   = each.value.body
-  replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
 

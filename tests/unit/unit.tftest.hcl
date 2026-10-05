@@ -84,6 +84,87 @@ run "lock_and_role_assignment_created" {
   }
 }
 
+run "private_endpoint_optional_fields" {
+  command = apply
+
+  variables {
+    private_endpoints = {
+      defaults = {
+        subnet_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-unit-test/providers/Microsoft.Network/virtualNetworks/vnet/subnets/default"
+        ip_configurations = {
+          default = {
+            name               = "default"
+            private_ip_address = "10.0.0.4"
+          }
+        }
+      }
+      configured = {
+        subnet_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-unit-test/providers/Microsoft.Network/virtualNetworks/vnet/subnets/default"
+        lock = {
+          kind  = "CanNotDelete"
+          notes = "Private endpoint lock"
+        }
+        role_assignments = {
+          reader = {
+            name                       = "33333333-3333-3333-3333-333333333333"
+            role_definition_id_or_name = "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"
+            principal_id               = "22222222-2222-2222-2222-222222222222"
+          }
+        }
+        ip_configurations = {
+          hsm = {
+            name               = "hsm"
+            private_ip_address = "10.0.0.5"
+            member_name        = "managedhsm"
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = azapi_resource.private_endpoints["defaults"].body.properties.ipConfigurations[0].properties.memberName == "default"
+    error_message = "Omitting member_name should preserve the utility module's default."
+  }
+  assert {
+    condition     = azapi_resource.private_endpoints["configured"].body.properties.ipConfigurations[0].properties.memberName == "managedhsm"
+    error_message = "The configured static IP member name should reach the private endpoint body."
+  }
+  assert {
+    condition     = azapi_resource.private_endpoints["configured"].body.properties.privateLinkServiceConnections[0].properties.groupIds == ["managedhsm"]
+    error_message = "Private endpoints should continue to target the Managed HSM sub-resource."
+  }
+  assert {
+    condition     = azapi_resource.private_endpoint_locks["configured"].body.properties.notes == "Private endpoint lock"
+    error_message = "Private endpoint lock notes should reach the lock body."
+  }
+  assert {
+    condition     = azapi_resource.private_endpoint_role_assignments["configured-reader"].name == "33333333-3333-3333-3333-333333333333"
+    error_message = "Private endpoint role assignments should honor an explicit name."
+  }
+}
+
+run "invalid_private_endpoint_delegated_identity_is_rejected" {
+  command = plan
+
+  variables {
+    private_endpoints = {
+      invalid = {
+        subnet_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-unit-test/providers/Microsoft.Network/virtualNetworks/vnet/subnets/default"
+        role_assignments = {
+          reader = {
+            role_definition_id_or_name             = "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"
+            principal_id                           = "22222222-2222-2222-2222-222222222222"
+            delegated_managed_identity_resource_id = "invalid"
+          }
+        }
+      }
+    }
+  }
+
+  expect_failures = [var.private_endpoints]
+}
+
 run "invalid_name_is_rejected" {
   command = plan
 

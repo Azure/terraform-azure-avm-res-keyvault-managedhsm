@@ -7,7 +7,6 @@ resource "azapi_resource" "private_endpoints" {
   parent_id              = coalesce(var.private_endpoints[each.key].resource_group_name, local.resource_group_id)
   type                   = each.value.type
   body                   = each.value.body
-  replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
   tags                   = each.value.tags != null ? each.value.tags : var.tags
@@ -31,7 +30,6 @@ resource "azapi_resource" "private_dns_zone_groups" {
   parent_id              = azapi_resource.private_endpoints[each.key].id
   type                   = each.value.type
   body                   = each.value.body
-  replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
 
@@ -54,7 +52,6 @@ resource "azapi_resource" "private_endpoint_role_assignments" {
   parent_id              = azapi_resource.private_endpoints[each.value.pe_key].id
   type                   = each.value.type
   body                   = each.value.body
-  replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
 
@@ -77,7 +74,6 @@ resource "azapi_resource" "private_endpoint_locks" {
   parent_id              = azapi_resource.private_endpoints[each.value.pe_key].id
   type                   = each.value.type
   body                   = each.value.body
-  replace_triggers_refs  = []
   response_export_values = []
   retry                  = var.retry
 
