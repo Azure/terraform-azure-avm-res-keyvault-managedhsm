@@ -41,7 +41,7 @@ resource "random_integer" "region_index" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.3"
+  version = "0.4.4"
 }
 
 # Managed HSM names are globally unique; a short random suffix keeps the example idempotent across runs.
@@ -136,7 +136,7 @@ Version:
 
 Source: Azure/naming/azurerm
 
-Version: 0.4.3
+Version: 0.4.4
 
 ### <a name="module_regions"></a> [regions](#module\_regions)
 

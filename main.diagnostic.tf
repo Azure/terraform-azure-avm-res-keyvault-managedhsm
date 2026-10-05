@@ -15,7 +15,6 @@ resource "azapi_resource" "diagnostic_settings" {
     "properties.logs"    = "category, categoryGroup"
     "properties.metrics" = "category"
   }
-  replace_triggers_refs     = []
   response_export_values    = []
   retry                     = var.retry
   schema_validation_enabled = false
