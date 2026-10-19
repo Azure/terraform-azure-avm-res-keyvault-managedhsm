@@ -2,6 +2,10 @@ terraform {
   required_version = ">= 1.9, < 2.0"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.12"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
@@ -22,8 +26,12 @@ data "azurerm_client_config" "current" {}
 # Randomise the region so concurrent example runs do not collide.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "0.12.0"
+  version = "0.13.0"
+  providers = {
+    azapi = azapi
+  }
 
+  location         = var.location
   enable_telemetry = var.enable_telemetry
 }
 
@@ -33,8 +41,8 @@ resource "random_integer" "region_index" {
 }
 
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.4"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 # Managed HSM names are globally unique; a short random suffix keeps the example idempotent across runs.
@@ -53,6 +61,9 @@ resource "azurerm_resource_group" "this" {
 
 module "managed_hsm" {
   source = "../../"
+  providers = {
+    azapi = azapi
+  }
 
   # In a real deployment, supply a SECURITY GROUP object ID rather than the current user.
   admin_object_ids = [data.azurerm_client_config.current.object_id]

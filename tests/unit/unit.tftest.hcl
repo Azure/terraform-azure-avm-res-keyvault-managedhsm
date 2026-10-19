@@ -5,8 +5,13 @@ mock_provider "azapi" {
       id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-unit-test/providers/Microsoft.KeyVault/managedHSMs/mhsmunittest01"
     }
   }
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
 }
-mock_provider "modtm" {}
+
 mock_provider "random" {}
 
 variables {
@@ -37,12 +42,16 @@ run "default_creates_hsm_and_telemetry" {
     error_message = "The Managed HSM should default to the pinned stable API version."
   }
   assert {
-    condition     = length(modtm_telemetry.telemetry) == 1
+    condition     = length(azapi_resource.telemetry) == 1
     error_message = "Telemetry resource should be created when enable_telemetry is true (default)."
   }
   assert {
     condition     = length(azapi_resource.lock) == 0
     error_message = "No lock should be created when var.lock is null."
+  }
+  providers = {
+    azapi  = azapi
+    random = random
   }
 }
 
@@ -54,8 +63,12 @@ run "telemetry_disabled" {
   }
 
   assert {
-    condition     = length(modtm_telemetry.telemetry) == 0
+    condition     = length(azapi_resource.telemetry) == 0
     error_message = "Telemetry resource should not be created when enable_telemetry is false."
+  }
+  providers = {
+    azapi  = azapi
+    random = random
   }
 }
 
@@ -81,6 +94,10 @@ run "lock_and_role_assignment_created" {
   assert {
     condition     = length(azapi_resource.role_assignments) == 1
     error_message = "A role assignment should be created for each entry in var.role_assignments."
+  }
+  providers = {
+    azapi  = azapi
+    random = random
   }
 }
 
@@ -142,6 +159,10 @@ run "private_endpoint_optional_fields" {
     condition     = azapi_resource.private_endpoint_role_assignments["configured-reader"].name == "33333333-3333-3333-3333-333333333333"
     error_message = "Private endpoint role assignments should honor an explicit name."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+  }
 }
 
 run "invalid_private_endpoint_delegated_identity_is_rejected" {
@@ -163,6 +184,10 @@ run "invalid_private_endpoint_delegated_identity_is_rejected" {
   }
 
   expect_failures = [var.private_endpoints]
+  providers = {
+    azapi  = azapi
+    random = random
+  }
 }
 
 run "invalid_name_is_rejected" {
@@ -173,6 +198,10 @@ run "invalid_name_is_rejected" {
   }
 
   expect_failures = [var.name]
+  providers = {
+    azapi  = azapi
+    random = random
+  }
 }
 
 run "empty_admins_rejected" {
@@ -183,4 +212,8 @@ run "empty_admins_rejected" {
   }
 
   expect_failures = [var.admin_object_ids]
+  providers = {
+    azapi  = azapi
+    random = random
+  }
 }
