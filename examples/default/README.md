@@ -9,6 +9,7 @@ terraform {
   required_version = ">= 1.9, < 2.0"
 
   required_providers {
+    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
       version = "~> 2.12"
@@ -34,9 +35,6 @@ data "azurerm_client_config" "current" {}
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.13.0"
-  providers = {
-    azapi = azapi
-  }
 
   location         = var.location
   enable_telemetry = var.enable_telemetry
@@ -68,9 +66,6 @@ resource "azurerm_resource_group" "this" {
 
 module "managed_hsm" {
   source = "../../"
-  providers = {
-    azapi = azapi
-  }
 
   # In a real deployment, supply a SECURITY GROUP object ID rather than the current user.
   admin_object_ids = [data.azurerm_client_config.current.object_id]
