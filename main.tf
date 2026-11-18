@@ -80,11 +80,11 @@ resource "azapi_resource" "this" {
 # azapi_resource.this (managed identity is therefore computed locally - see locals.tf).
 module "avm_interfaces" {
   source  = "Azure/avm-utl-interfaces/azure"
-  version = "0.9.0"
+  version = "0.10.0"
 
-  location               = var.location
   diagnostic_settings_v2 = var.diagnostic_settings
   enable_telemetry       = var.enable_telemetry
+  location               = var.location
   private_endpoints = {
     for k, v in var.private_endpoints : k => merge(v, { subresource_name = "managedhsm" })
   }
