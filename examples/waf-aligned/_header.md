@@ -1,4 +1,4 @@
-# Max example
+# WAF-aligned example
 
 This deploys the module exercising the standard AVM interfaces:
 
