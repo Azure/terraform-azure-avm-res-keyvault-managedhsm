@@ -27,7 +27,7 @@ data "azurerm_client_config" "current" {}
 # Randomise the region so concurrent example runs do not collide.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "0.13.2"
+  version = "0.14.0"
 
   location         = var.location
   enable_telemetry = var.enable_telemetry
